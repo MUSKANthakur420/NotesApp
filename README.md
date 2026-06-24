@@ -1,16 +1,92 @@
-# React + Vite
+# 📝 Notely
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A notes app I built to learn full stack development — React on the front, Node.js + MongoDB on the back. You can sign up, log in, and manage your own notes. There's also an AI feature that generates structured notes on any topic using Groq's Llama model.
 
-Currently, two official plugins are available:
+## Why I built this
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+I wanted to go beyond tutorial projects and actually connect a React frontend to a real backend with auth, a database, and an external API. This project taught me how all those pieces talk to each other.
 
-## React Compiler
+## What it does
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Register and login with JWT-based authentication
+- Add, edit, delete, and search your notes
+- Generate AI-powered tutor-style notes on any topic (with formulas, examples, and key points)
+- Your notes are private — only you can see them after logging in
 
-## Expanding the ESLint configuration
+## Tech used
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Frontend** — React, Redux Toolkit, React Router, Axios, Vite
+
+**Backend** — Node.js, Express, MongoDB, Mongoose, JWT, bcrypt
+
+**AI** — Groq SDK (Llama 3.3 70b)
+
+## Getting started
+
+Clone the repo
+
+```bash
+git clone https://github.com/MUSKANthakur420/NotesApp.git
+cd NotesApp
+```
+
+Install frontend dependencies
+```bash
+npm install
+```
+
+Install backend dependencies
+```bash
+cd backend
+npm install
+```
+
+Set up environment variables — create a `.env` file inside `backend/`:
+PORT=8000
+
+MONGODB_URL=your_mongodb_url
+
+ACCESS_TOKEN_SECRET=your_secret
+
+ACCESS_TOKEN_EXPIRY=1d
+
+REFRESH_TOKEN_SECRET=your_refresh_secret
+
+REFRESH_TOKEN_EXPIRY=7d
+
+GROQ_API_KEY=your_groq_api_key
+
+Run the backend
+```bash
+cd backend
+npm run dev
+```
+
+Run the frontend (in a new terminal)
+```bash
+cd NotesApp
+npm run dev
+```
+
+Open `http://localhost:5173`
+
+## What I learned
+
+- How JWT authentication works end to end
+- Why httpOnly cookies are safer than localStorage for tokens
+- How Redux async thunks handle API calls and loading/error states
+- How Mongoose schemas silently ignore fields not defined in them (learned this the hard way)
+- How SSE (Server Sent Events) works for streaming AI responses
+- Connecting a React app to an Express backend with CORS and credentials
+
+## Challenges I ran into
+
+- CORS kept blocking requests until I understood that `credentials: true` requires an explicit origin, not a wildcard
+- Notes weren't saving with `userId` because the field was missing from the Mongoose schema — Mongoose doesn't throw an error, it just silently drops it
+- JWT stores `_id` as a string but MongoDB queries need an ObjectId — had to convert with `new mongoose.Types.ObjectId()`
+- bcrypt.compare returns a Promise — missing `await` made every password check fail silently
+
+## Author
+
+Muskan Singh — ECE student at KIET Group of Institutions
+[LinkedIn](https://linkedin.com/in/muskan-singh-72b338328) • [GitHub](https://github.com/MUSKANthakur420)

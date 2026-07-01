@@ -6,7 +6,7 @@ const app = express();
 
 // CORS
 app.use(cors({
-  origin: 'http://localhost:5173',   
+  origin: 'https://notesapp-backend-hst5.onrender.com',   
   credentials: true
 }))
 

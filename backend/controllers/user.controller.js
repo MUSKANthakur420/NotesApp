@@ -2,7 +2,7 @@
 import { asynchandler } from "../utils/asynchandler.js";
 import { apires } from "../utils/apires.js";
 import { apierror } from "../utils/apierror.js";
-import User from '../models/User.model.js'
+import User from '../models/user.model.js'
 const generateAccessTokenAndRefreshToken = async(userId) => {
     try {
         const user = await User.findById(userId);

@@ -6,7 +6,7 @@ const app = express();
 
 // CORS
 app.use(cors({
-  origin: 'http://localhost:5173',   // your frontend port
+  origin: 'http://localhost:5173',   
   credentials: true
 }))
 

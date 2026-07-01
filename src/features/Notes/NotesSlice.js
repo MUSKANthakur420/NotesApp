@@ -1,83 +1,111 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from '../../utils/axios'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
 
-// ── Thunks ──────────────────────────────────────
-
-export const fetchNotes = createAsyncThunk('notes/fetchAll', async (_, { rejectWithValue }) => {
+// Fetch all notes
+export const fetchNotes = createAsyncThunk(
+  "notes/fetchAll",
+  async (_, { rejectWithValue }) => {
     try {
-        const res = await axios.get('/notes')
-        return res.data.data
-    } catch(err) {
-        return rejectWithValue(err.response.data.message)
+      const res = await axios.get("/api/v1/notes");
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch notes");
     }
-})
+  }
+);
 
-export const createNote = createAsyncThunk('notes/create', async ({ topic, theory }, { rejectWithValue }) => {
+// Create note
+export const createNote = createAsyncThunk(
+  "notes/create",
+  async ({ topic, theory }, { rejectWithValue }) => {
     try {
-        const res = await axios.post('/notes', { topic, theory })
-        return res.data.data
-    } catch(err) {
-        return rejectWithValue(err.response.data.message)
+      const res = await axios.post("/api/v1/notes", { topic, theory });
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to create note");
     }
-})
+  }
+);
 
-export const updateNote = createAsyncThunk('notes/update', async ({ id, topic, theory }, { rejectWithValue }) => {
+// Update note
+export const updateNote = createAsyncThunk(
+  "notes/update",
+  async ({ id, topic, theory }, { rejectWithValue }) => {
     try {
-        const res = await axios.patch(`/notes/${id}`, { topic, theory })
-        return res.data.data
-    } catch(err) {
-        return rejectWithValue(err.response.data.message)
+      const res = await axios.patch(`/api/v1/notes/${id}`, {
+        topic,
+        theory,
+      });
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to update note");
     }
-})
+  }
+);
 
-export const deleteNote = createAsyncThunk('notes/delete', async (id, { rejectWithValue }) => {
+// Delete note
+export const deleteNote = createAsyncThunk(
+  "notes/delete",
+  async (id, { rejectWithValue }) => {
     try {
-        await axios.delete(`/notes/${id}`)
-        return id
-    } catch(err) {
-        return rejectWithValue(err.response.data.message)
+      await axios.delete(`/api/v1/notes/${id}`);
+      return id;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to delete note");
     }
-})
-
-// ── Slice ────────────────────────────────────────
+  }
+);
 
 const NotesSlice = createSlice({
-    name: 'Note',
-    initialState: {
-        Notes: [],
-        edit: null,
-        search: '',
-        loading: false,
-        error: null
+  name: "Note",
+  initialState: {
+    Notes: [],
+    edit: null,
+    search: "",
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    editNotes: (state, action) => {
+      state.edit = action.payload;
     },
-    reducers: {
-        editNotes: (state, action) => { state.edit = action.payload },
-        searchNotes: (state, action) => { state.search = action.payload }
+    searchNotes: (state, action) => {
+      state.search = action.payload;
     },
-    extraReducers: (builder) => {
-        // fetch
-        builder.addCase(fetchNotes.pending, (state) => { state.loading = true; state.error = null })
-        builder.addCase(fetchNotes.fulfilled, (state, action) => { state.loading = false; state.Notes = action.payload })
-        builder.addCase(fetchNotes.rejected, (state, action) => { state.loading = false; state.error = action.payload })
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchNotes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNotes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.Notes = action.payload;
+      })
+      .addCase(fetchNotes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-        // create
-        builder.addCase(createNote.fulfilled, (state, action) => { state.Notes.unshift(action.payload) })
-        builder.addCase(createNote.rejected, (state, action) => { state.error = action.payload })
+      .addCase(createNote.fulfilled, (state, action) => {
+        state.Notes.unshift(action.payload);
+      })
 
-        // update
-        builder.addCase(updateNote.fulfilled, (state, action) => {
-            state.Notes = state.Notes.map(n => n._id === action.payload._id ? action.payload : n)
-            state.edit = null
-        })
-        builder.addCase(updateNote.rejected, (state, action) => { state.error = action.payload })
+      .addCase(updateNote.fulfilled, (state, action) => {
+        state.Notes = state.Notes.map((note) =>
+          note._id === action.payload._id ? action.payload : note
+        );
+        state.edit = null;
+      })
 
-        // delete
-        builder.addCase(deleteNote.fulfilled, (state, action) => {
-            state.Notes = state.Notes.filter(n => n._id !== action.payload)
-        })
-        builder.addCase(deleteNote.rejected, (state, action) => { state.error = action.payload })
-    }
-})
+      .addCase(deleteNote.fulfilled, (state, action) => {
+        state.Notes = state.Notes.filter(
+          (note) => note._id !== action.payload
+        );
+      });
+  },
+});
 
-export const { editNotes, searchNotes } = NotesSlice.actions
-export default NotesSlice.reducer
+export const { editNotes, searchNotes } = NotesSlice.actions;
+export default NotesSlice.reducer;
